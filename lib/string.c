@@ -772,7 +772,6 @@ void *memset(void *s, int c, size_t count)
 	/* copy the remainder */
 	while (count--)
 		*dest.as_u8++ = c;
-
 	return s;
 }
 EXPORT_SYMBOL(memset);
