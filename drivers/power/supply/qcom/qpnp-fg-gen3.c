@@ -676,6 +676,18 @@ static int fg_get_battery_temp(struct fg_chip *chip, int *val)
 	/* Value is in Kelvin; Convert it to deciDegC */
 	temp = (temp - 273) * 10;
 	*val = temp;
+<<<<<<< HEAD
+=======
+#endif
+#if defined(CONFIG_SOMC_CHARGER_EXTENSION)
+	/* Value is in Kelvin; Convert it to deciDegC with keeping accuracy */
+	*val = CONV_BATT_TEMP_DEGC_FROM_LSB(temp);
+#endif
+
+	/* Reduce temp after conversion */
+	*val -= BATT_TEMP_HACK;
+
+>>>>>>> 9b46007ef9d3 (power: qpnp-fg-gen3: Hack battery temp reading)
 	return 0;
 }
 
