@@ -16,13 +16,8 @@ jobs:
       with:
         submodules: 'true'
         fetch-depth: 0
-        
-    # ─── Set up ccache────────────────────────────────────────────────────
     - name: Set up ccache
       uses: hendrikmuhs/ccache-action@v1.2.16
-    # ─────────────────────────────────────────────────────────────────
-
-    # ─── Initialize GetTime────────────────────────────────────────────────────
     - name: Install dependencies
       run: |
         sudo timedatectl set-timezone Asia/Dhaka
@@ -31,16 +26,12 @@ jobs:
         git clone --depth=1 https://github.com/kdrag0n/proton-clang.git clang
         git clone https://github.com/ij-israfil/AnyKernel3 -b master --depth=1
         rm -rf AnyKernel3/.git AnyKernel3/.github
-    # ─────────────────────────────────────────────────────────────────
-
-    # ─── Initialize GetTime────────────────────────────────────────────────────
     - name: GetTime
       id: get_time
       run: echo "TIME=$(TZ=GMT+06 date +%m%d%H%M)" >> $GITHUB_OUTPUT
-    # ─────────────────────────────────────────────────────────────────
 
-    # ─── Initialize KernelSU Next ────────────────────────────────────────────────────
-    - name: Initialize KernelSU-Next
+    # ─── KernelSU ────────────────────────────────────────────────────
+    - name: 🛠 Initialize KernelSU-Next
       run: |
         echo ">>> Initializing KernelSU-Next + SUSFS..."
         curl -LSs "https://raw.githubusercontent.com/Sorayukii/KernelSU-Next/refs/heads/stable/kernel/setup.sh" \
