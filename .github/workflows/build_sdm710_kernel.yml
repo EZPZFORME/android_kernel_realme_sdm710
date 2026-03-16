@@ -119,16 +119,8 @@ jobs:
             exit 1
           fi
           echo "✅ Build successful!"
-
-      # ─── 9. Upload log on failure ─────────────────────────────────────────
-      - name: 📋 Upload Build Log
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-log
-          path: build.log
-
-      # ─── 10. Package ─────────────────────────────────────────────────────
+          
+      # ─── 9. Package ─────────────────────────────────────────────────────
       - name: 📦 Package Kernel
         run: |
           cp out/arch/${{ env.ARCH }}/boot/${{ env.KERNEL_IMAGE }} AnyKernel3/
