@@ -164,3 +164,4 @@ jobs:
           files: ${{ env.ZIP_NAME }}
           draft: false
           prerelease: false
+          path: "AnyKernel3/*"
