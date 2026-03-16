@@ -28,7 +28,7 @@ jobs:
 
     steps:
       # ─── 1. Checkout ─────────────────────────────────────────────────────
-      - name: 📥 Checkout Kernel Source
+      - name: 🗂 Checkout Kernel Source
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
@@ -41,30 +41,31 @@ jobs:
           key: build-kernel-proton-${{ env.DEVICE_CODENAME }}
 
       # ─── 3. Dependencies ─────────────────────────────────────────────────
-      - name: 🛠 Install Build Dependencies
+      - name: ⚙️ Install Build Dependencies
         run: |
-          sudo apt-get update -qq
+          sudo apt-get update -qq && \
+          sudo apt-get upgrade -y -qq && \
           sudo apt-get install -y --no-install-recommends \
-            bc bison build-essential binutils ca-certificates cpio curl \
-            device-tree-compiler flex git git-lfs libssl-dev \
-            make python3 python-is-python3 unzip zip xz-utils \
-            libelf-dev libncurses5-dev libtinfo5 llvm lld \
-            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
+          bc bison build-essential binutils ca-certificates cpio curl \
+          device-tree-compiler flex git git-lfs libssl-dev \
+          make python3 python-is-python3 unzip zip xz-utils \
+          libelf-dev libncurses5-dev libtinfo5 llvm lld \
+          gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
 
       # ─── 4. Toolchain ────────────────────────────────────────────────────
-      - name: 📥 Download Proton Clang
+      - name: 🛠️ Download Proton Clang
         run: |
           git clone --depth=1 ${{ env.CLANG_URL }} clang
           echo "$(pwd)/clang/bin" >> $GITHUB_PATH
 
       # ─── 5. AnyKernel3 ───────────────────────────────────────────────────
-      - name: 📥 Clone AnyKernel3
+      - name: 🛠️ Clone AnyKernel3
         run: |
           git clone --depth=1 -b ${{ env.ANYKERNEL_BRANCH }} \
             ${{ env.ANYKERNEL_REPO }} AnyKernel3
 
       # ─── 6. KernelSU ─────────────────────────────────────────────────────
-      - name: 🛠 Initialize KernelSU-Next
+      - name: ⚙️ Initialize KernelSU-Next
         run: |
           echo ">>> Initializing KernelSU-Next + SUSFS..."
           curl -LSs "https://raw.githubusercontent.com/Sorayukii/KernelSU-Next/refs/heads/stable/kernel/setup.sh" \
@@ -77,7 +78,7 @@ jobs:
         run: echo "TIME=$(date +%Y.%m.%d-%H%M)" >> $GITHUB_OUTPUT
 
       # ─── 8. Build ────────────────────────────────────────────────────────
-      - name: 🏗 Build Kernel
+      - name: 💫 Build Kernel
         run: |
           export PATH=$(pwd)/clang/bin:$PATH
 
@@ -142,10 +143,9 @@ jobs:
 
       # ─── 11. Release ─────────────────────────────────────────────────────
       - name: 🚀 Release
-        uses: softprops/action-gh-release@v2
+        uses: actions/upload-artifact@v4.6.0
         with:
-          token: ${{ secrets.GH_PAT }}
-          tag_name: "Khaenriah-Kernel-${{ env.KERNEL_VERSION }}-${{ steps.get_time.outputs.TIME }}"
+          tag_name: "BloodMoon-Kernel-${{ env.KERNEL_VERSION }}-${{ steps.get_time.outputs.TIME }}"
           name: "Khaenriah Kernel | ${{ env.DEVICE_CODENAME }} | ${{ steps.get_time.outputs.TIME }}"
           body: |
             ## Khaenriah Kernel ${{ env.KERNEL_VERSION }} - ${{ env.KERNEL_VARIANT }}
