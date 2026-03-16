@@ -145,23 +145,5 @@ jobs:
       - name: 🚀 Release
         uses: actions/upload-artifact@v4.6.0
         with:
-          tag_name: "BloodMoon-Kernel-${{ env.KERNEL_VERSION }}-${{ steps.get_time.outputs.TIME }}"
-          name: "Khaenriah Kernel | ${{ env.DEVICE_CODENAME }} | ${{ steps.get_time.outputs.TIME }}"
-          body: |
-            ## Khaenriah Kernel ${{ env.KERNEL_VERSION }} - ${{ env.KERNEL_VARIANT }}
-
-            | Info | Details |
-            |------|---------|
-            | Device | ${{ env.DEVICE_CODENAME }} |
-            | Compiler | Proton Clang |
-            | KernelSU | Next + SUSFS |
-            | Branch | ${{ github.ref_name }} |
-            | Commit | ${{ github.sha }} |
-            | Build Date | ${{ steps.get_time.outputs.TIME }} |
-
-            ### Changes
-            ${{ github.event.head_commit.message }}
-          files: ${{ env.ZIP_NAME }}
-          draft: false
-          prerelease: false
-          path: "AnyKernel3/*"
+        name: RMX1901-Perf-Kernel-${{ steps.build_kern.outputs.VERSION }}-${{ steps.get_time.outputs.TIME }}
+        path: "AnyKernel3/*"
