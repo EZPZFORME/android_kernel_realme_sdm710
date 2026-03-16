@@ -1,15 +1,12 @@
 name: Build Khaenriah Kernel
-
 on:
   workflow_dispatch:
-
 jobs:
   build:
     name: Building BloodMoon~Revived Kernel for RMX1901 (Realme X)
     runs-on: ubuntu-22.04
     permissions:
       contents: write
-
     env:
       TZ: Asia/Jakarta
       USE_CCACHE: "true"
@@ -25,21 +22,18 @@ jobs:
       KBUILD_BUILD_HOST: "RMX1901-Rebuild"
       KERNEL_VERSION: "v1.0"
       KERNEL_VARIANT: "BloodMoon~Revived"
-
     steps:
       # ─── 1. Checkout ─────────────────────────────────────────────────────
       - name: 🗂 Checkout Kernel Source
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-
       # ─── 2. ccache ───────────────────────────────────────────────────────
       - name: ⚡ Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           max-size: "2G"
           key: build-kernel-proton-${{ env.DEVICE_CODENAME }}
-
       # ─── 3. Dependencies ─────────────────────────────────────────────────
       - name: ⚙️ Install Build Dependencies
         run: |
@@ -51,19 +45,16 @@ jobs:
           make python3 python-is-python3 unzip zip xz-utils \
           libelf-dev libncurses5-dev libtinfo5 llvm lld \
           gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
-
       # ─── 4. Toolchain ────────────────────────────────────────────────────
       - name: 🛠️ Download Proton Clang
         run: |
           git clone --depth=1 ${{ env.CLANG_URL }} clang
           echo "$(pwd)/clang/bin" >> $GITHUB_PATH
-
       # ─── 5. AnyKernel3 ───────────────────────────────────────────────────
       - name: 🛠️ Clone AnyKernel3
         run: |
           git clone --depth=1 -b ${{ env.ANYKERNEL_BRANCH }} \
             ${{ env.ANYKERNEL_REPO }} AnyKernel3
-
       # ─── 6. KernelSU ─────────────────────────────────────────────────────
       - name: ⚙️ Initialize KernelSU-Next
         run: |
@@ -71,27 +62,21 @@ jobs:
           curl -LSs "https://raw.githubusercontent.com/Sorayukii/KernelSU-Next/refs/heads/stable/kernel/setup.sh" \
             | bash -s susfs-main
           echo ">>> Done."
-
       # ─── 7. Build time ───────────────────────────────────────────────────
       - name: 🕒 Get Build Time
         id: get_time
         run: echo "TIME=$(date +%Y.%m.%d-%H%M)" >> $GITHUB_OUTPUT
-
       # ─── 8. Build ────────────────────────────────────────────────────────
       - name: 💫 Build Kernel
         run: |
           export PATH=$(pwd)/clang/bin:$PATH
-
           echo ">>> Clang version: $(clang --version | head -1)"
           echo ">>> CPUs: $(nproc --all)"
           echo ">>> Building defconfig..."
-
           make O=out \
             ARCH=${{ env.ARCH }} \
             ${{ env.KERNEL_DEFCONFIG }}
-
           echo ">>> Compiling..."
-
           make O=out -j$(nproc --all) \
             ARCH=${{ env.ARCH }} \
             SUBARCH=${{ env.SUBARCH }} \
@@ -113,29 +98,24 @@ jobs:
             KBUILD_BUILD_HOST=${{ env.KBUILD_BUILD_HOST }} \
             KCFLAGS="-w -Wno-error=int-conversion -Wno-error=incompatible-pointer-types -Wno-error=unused-command-line-argument -Wno-error=address-of-packed-member" \
             2>&1 | tee build.log
-
           if [ ! -f out/arch/${{ env.ARCH }}/boot/${{ env.KERNEL_IMAGE }} ]; then
             echo "❌ Build Failed! Image not found."
             exit 1
           fi
           echo "✅ Build successful!"
-          
-      # ─── 9. Package ─────────────────────────────────────────────────────
+
+      # ─── 9. Package ──────────────────────────────────────────────────────
       - name: 📦 Package Kernel
         run: |
           cp out/arch/${{ env.ARCH }}/boot/${{ env.KERNEL_IMAGE }} AnyKernel3/
-
           ZIP_NAME="Khaenriah-${{ env.KERNEL_VERSION }}-${{ env.KERNEL_VARIANT }}-KSUN-SUSFS-2.0.0-${{ env.DEVICE_CODENAME }}-${{ steps.get_time.outputs.TIME }}.zip"
-
           cd AnyKernel3
           zip -r9 "../${ZIP_NAME}" ./* -x "*.git*" -x "README.md"
           cd ..
-
           echo "ZIP_NAME=${ZIP_NAME}" >> $GITHUB_ENV
-
-      # ─── 11. Release ─────────────────────────────────────────────────────
+      # ─── 10. Release ─────────────────────────────────────────────────────
       - name: 🚀 Release
         uses: actions/upload-artifact@v4.6.0
         with:
-        name: RMX1901-Perf-Kernel-${{ steps.build_kern.outputs.VERSION }}-${{ steps.get_time.outputs.TIME }}
-        path: "AnyKernel3/*"
+          name: Khaenriah-${{ env.KERNEL_VERSION }}-${{ env.KERNEL_VARIANT }}-${{ env.DEVICE_CODENAME }}-${{ steps.get_time.outputs.TIME }}
+          path: ${{ env.ZIP_NAME }}
