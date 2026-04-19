@@ -2216,20 +2216,12 @@ struct task_struct {
 	/* A live task holds one reference. */
 	atomic_t stack_refcount;
 #endif
-#ifdef OPLUS_FEATURE_UIFIRST
-	int static_ux;
-	atomic64_t dynamic_ux;
-	struct list_head ux_entry;
-	int ux_depth;
-	u64 enqueue_time;
-	u64 dynamic_ux_start;
-#ifdef CONFIG_CAMERA_OPT
-        int camera_opt;
+
+#ifdef CONFIG_KSU_SUSFS
+	u64 susfs_task_state;
+	u64 susfs_last_fake_mnt_id;
 #endif
-#endif /* OPLUS_FEATURE_UIFIRST */
-#ifdef CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT
-	struct fuse_package *fpack;
-#endif /* CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT */
+
 /* CPU-specific state of this task */
 	struct thread_struct thread;
 /*

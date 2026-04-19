@@ -1051,7 +1051,11 @@ void ida_remove(struct ida *ida, int id)
 	return;
 
  err:
-	WARN(1, "ida_remove called for id=%d which is not allocated.\n", id);
+ #ifdef CONFIG_KSU_SUSFS
+	 pr_debug("ida_remove: called for id=%d which is not allocated.\n", id);
+ #else
+	 WARN(1, "ida_remove called for id=%d which is not allocated.\n", id);
+ #endif
 }
 EXPORT_SYMBOL(ida_remove);
 
